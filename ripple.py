@@ -1,5 +1,6 @@
 import pygame as pg
 
+from constants import consts as c
 
 class Ripple:
     def __init__(self, x, y, start_radius, end_radius, color, screen):
@@ -31,14 +32,14 @@ class Ripple:
 
     def update(self):
         if self.inwards:
-            self.radius -= self.speed
+            self.radius -= self.speed * c.dt
             if self.radius <= self.end_radius:
                 self.display = False
         else:
-            self.radius += self.speed
+            self.radius += self.speed * c.dt
             if self.radius >= self.end_radius:
                 self.display = False
-        self.thickness += self.slope * self.speed
+        self.thickness += self.slope * self.speed * c.dt
 
     def render(self):
         if self.display:

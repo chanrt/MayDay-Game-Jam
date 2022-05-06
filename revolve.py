@@ -1,6 +1,9 @@
 from math import cos, pi, sin
 import pygame as pg
 
+from constants import consts as c
+
+
 class Revolve:
     def __init__(self, x, y, orbit_radius, particle_radius, color, screen):
         self.x = x
@@ -14,7 +17,7 @@ class Revolve:
         self.orbit_thickness = 2
 
         self.display = True
-        self.speed = 0.05
+        self.speed = 5
 
         self.angle = 0
 
@@ -27,7 +30,7 @@ class Revolve:
             self.separation = 2 * pi / self.num_particles
 
     def update(self):
-        self.angle += self.speed
+        self.angle += self.speed * c.dt
         while self.angle > 2 * pi:
             self.angle -= 2 * pi
         
