@@ -14,6 +14,7 @@ class Constants:
         self.nucleus_speed_horizontal = 240
         self.nucleus_speed_vertical = 480
         self.projectile_speed = 600
+        self.enemy_speed = 150
         
         # colors
         self.normal_nucleus_color = pg.Color("#1f51ff")
@@ -46,6 +47,11 @@ class Constants:
         self.artifact_probability = 0.7
         self.artifact_width = 15
 
+        # enemy
+        self.enemy_probability = 0.7
+
+        # projectile damage
+        self.damage_to_enemy = 1
 
     def set_screen_size(self, screen):
         self.screen_width, self.screen_height = screen.get_size()

@@ -29,7 +29,7 @@ class Explosion:
         self.max_particle_size = 3
 
         self.current_step = 0
-        self.final_step = 100
+        self.final_step = 200
 
         self.make_particles()
 

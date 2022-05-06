@@ -10,8 +10,8 @@ class Player:
 
     def __init__(self, mass, matter, screen):
         self.mass = mass
-        self.screen = screen
         self.matter = matter
+        self.screen = screen
 
         if matter == "normal":
             self.nucleus_color = c.normal_nucleus_color
@@ -68,7 +68,7 @@ class Player:
     def render(self):
         if self.alive:
             pg.draw.circle(self.screen, self.nucleus_color,
-                        (int(self.x), int(self.y)), int(self.radius))
+                           (int(self.x), int(self.y)), int(self.radius))
             self.revolve.render()
             self.ripple_generator.render()
 

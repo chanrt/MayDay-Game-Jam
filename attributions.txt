@@ -1,0 +1,5 @@
+Sounds:
+1) artifact_collision.wav, player_shoot.wav and ricochet.wav generated from https://sfxr.me
+
+Fonts:
+1) Orbitron-Regular.ttf from https://fonts.google.com/specimen/Orbitron
