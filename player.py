@@ -1,4 +1,4 @@
-from math import pi
+from math import ceil, pi
 import pygame as pg
 
 from constants import consts as c
@@ -74,13 +74,17 @@ class Player:
 
     def increase_mass(self, mass):
         self.mass += mass
-        if self.mass > c.max_mass:
+        if self.mass >= c.max_mass:
             self.mass = c.max_mass
         self.calculate_radius()
 
     def decrease_mass(self, mass):
         self.mass -= mass
-        self.calculate_radius()
+        if self.mass < 0:
+            self.alive = False
+            self.radius = 0
+        else:
+            self.calculate_radius()
 
     def lose_electrons(self):
         self.mass = self.mass - self.num_electrons * c.electron_mass
@@ -101,10 +105,10 @@ class Player:
             self.revolve.display = False
 
     def calculate_radius(self):
-        if self.mass >= c.max_nucleons * c.nucleon_mass:
+        if self.mass > c.max_nucleons * c.nucleon_mass:
             self.nuclear_mass = c.max_nucleons * c.nucleon_mass
             self.total_electron_mass = self.mass - self.nuclear_mass
-            self.num_electrons = int(self.total_electron_mass /
+            self.num_electrons = ceil(self.total_electron_mass /
                                      c.electron_mass)
         else:
             self.nuclear_mass = self.mass

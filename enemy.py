@@ -20,6 +20,7 @@ class Enemy:
         else:
             self.color = c.anti_nucleus_color
         self.alive = True
+        self.fire_cycle = 1
 
     def take_damage(self, damage):
         self.mass -= damage
@@ -42,6 +43,10 @@ class Enemy:
             return False
 
     def update(self, player, artifacts):
+        self.fire_cycle += 1
+        if self.fire_cycle == c.enemy_fire_cycle:
+            self.fire_cycle = 0
+
         artifacts_in_front = list(filter(lambda a: a.x < self.x, artifacts))
         artifacts_in_front.sort(key=lambda a: a.x)
 

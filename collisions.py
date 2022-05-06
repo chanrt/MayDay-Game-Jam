@@ -37,5 +37,15 @@ def enemy_projectile_collision(projectile, enemy):
         return True
     return False
 
+def player_projectile_collision(player, projectile):
+    if distance_between(player, projectile) < player.radius + c.projectile_radius:
+        return True
+    return False
+
+def projectile_projectile_collision(projectile1, projectile2):
+    if distance_between(projectile1, projectile2) < 2 * c.projectile_radius:
+        return True
+    return False
+
 def distance_between(player, enemy):
     return ((player.x - enemy.x) ** 2 + (player.y - enemy.y) ** 2) ** 0.5

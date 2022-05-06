@@ -1,3 +1,4 @@
+from itertools import product
 from math import atan2
 from random import random
 import pygame as pg
@@ -9,6 +10,7 @@ from enemy import Enemy
 from explosion import Explosion
 from load_data import get_resource_path
 from player import Player
+from progress_bar import ProgressBar
 from projectile import Projectile
 from text import Text
 
@@ -16,33 +18,51 @@ from text import Text
 def game_loop(screen):
     clock = pg.time.Clock()
 
-    simple_font = pg.font.SysFont("arial", 20)
-
-    # title text
-    title_text = Text(c.screen_width // 2, c.title_font_size // 2, "Particle Menace", screen)
-    title_font = pg.font.Font(get_resource_path("fonts/Orbitron-Regular.ttf"), c.title_font_size)
-    title_text.set_font(title_font)
-
-    # sounds
-    player_shoot_sound = pg.mixer.Sound(get_resource_path("sounds/player_shoot.wav"))
-    player_shoot_sound.set_volume(0.2)
-    player_death_sound = pg.mixer.Sound(get_resource_path("sounds/player_death.wav"))
-    ricochet_sound = pg.mixer.Sound(get_resource_path("sounds/ricochet.wav"))
-    artifact_enemy_collision_sound = pg.mixer.Sound(get_resource_path("sounds/artifact_enemy_collision.wav"))
-    enemy_player_collision_sound = pg.mixer.Sound(get_resource_path("sounds/enemy_player_collision.wav"))
-    enemy_hit_sound = pg.mixer.Sound(get_resource_path("sounds/enemy_hit.wav"))
-    enemy_death_sound = pg.mixer.Sound(get_resource_path("sounds/enemy_death.wav"))
-
-    # colorsd
-    font_color = pg.Color("white")
-    bg_color = pg.Color(32, 32, 32)
-
     # states
     current_matter = "normal"
     opposite_matter = "anti"
 
+    # colors
+    font_color = pg.Color("white")
+    bg_color = pg.Color(32, 32, 32)
+    dominant_color = c.normal_nucleus_color if current_matter == "normal" else c.anti_nucleus_color
+
     # game objects
-    player = Player(6, current_matter, screen)
+    player = Player(13.2, current_matter, screen)
+
+    # fonts
+    simple_font = pg.font.SysFont("arial", 20)
+    title_font = pg.font.Font(get_resource_path("fonts/Orbitron-Regular.ttf"), c.title_font_size)
+    indicator_font = pg.font.Font(get_resource_path("fonts/Orbitron-Regular.ttf"), c.indicator_font_size)
+
+    # text
+    title_text = Text(c.screen_width // 2, c.title_font_size // 2, "Particle Menace", screen)
+    title_text.set_font(title_font)
+    below_title = c.title_font_size + c.indicator_font_size // 2
+    mass_text = Text(c.screen_width // 4, below_title, "Mass", screen)
+    mass_text.set_font(indicator_font)
+    energy_text = Text(3 * c.screen_width // 4, below_title, "Energy", screen)
+    energy_text.set_font(indicator_font)
+
+    # progress bars
+    below_indicator = c.title_font_size + c.indicator_font_size + 2 * c.progress_bar_thickness
+    mass_bar = ProgressBar(c.screen_width // 4, below_indicator, c.screen_width // 4, c.progress_bar_thickness, screen)
+    mass_bar.fg_color = dominant_color
+    mass_bar.set_progress(player.mass / c.max_mass)
+    energy_bar = ProgressBar(3 * c.screen_width // 4, below_indicator, c.screen_width // 4, c.progress_bar_thickness, screen)
+    energy_bar.fg_color = dominant_color
+
+    # sounds
+    artifact_enemy_collision_sound = pg.mixer.Sound(get_resource_path("sounds/artifact_enemy_collision.wav"))
+    enemy_player_collision_sound = pg.mixer.Sound(get_resource_path("sounds/enemy_player_collision.wav"))
+    enemy_hit_sound = pg.mixer.Sound(get_resource_path("sounds/enemy_hit.wav"))
+    enemy_death_sound = pg.mixer.Sound(get_resource_path("sounds/enemy_death.wav"))
+    enemy_shoot_sound = pg.mixer.Sound(get_resource_path("sounds/enemy_shoot.wav"))
+    player_shoot_sound = pg.mixer.Sound(get_resource_path("sounds/player_shoot.wav"))
+    player_shoot_sound.set_volume(0.2)
+    player_death_sound = pg.mixer.Sound(get_resource_path("sounds/player_death.wav"))
+    player_hit_sound = pg.mixer.Sound(get_resource_path("sounds/player_hit.wav"))
+    ricochet_sound = pg.mixer.Sound(get_resource_path("sounds/ricochet.wav"))
 
     # artifacts
     artifacts = []
@@ -89,7 +109,7 @@ def game_loop(screen):
 
         # clean projectiles
         for projectile in projectiles:
-            if projectile.outside_screen():
+            if projectile.outside_screen() or projectile.active == False:
                 projectiles.remove(projectile)        
 
         # handle player input
@@ -106,7 +126,7 @@ def game_loop(screen):
                 if random() < c.enemy_probability:
                     # generate enemy
                     y = random() * (c.screen_height)
-                    mass = 0.5 * random() * player.mass
+                    mass = c.min_enemy_mass + random() * (c.max_enemy_mass - c.min_enemy_mass)
                     new_enemy = Enemy(y, mass, opposite_matter, screen)
                     enemies.append(new_enemy)
 
@@ -117,9 +137,11 @@ def game_loop(screen):
                 if event.key == pg.K_q:
                     # CHEAT
                     player.increase_mass(0.2)
+                    mass_bar.set_progress(player.mass / c.max_mass)
                 if event.key == pg.K_e:
                     # CHEAT
                     player.decrease_mass(0.2)
+                    mass_bar.set_progress(player.mass / c.max_mass)
 
             if event.type == pg.MOUSEBUTTONDOWN:
                 if event.button == 1:
@@ -146,6 +168,14 @@ def game_loop(screen):
         for animation in animations:
             animation.update()
 
+        # see if any enemy is ready to fire
+        for enemy in enemies:
+            if enemy.fire_cycle == 0:
+                enemy_shoot_sound.play()
+                angle = atan2(player.y - enemy.y, player.x - enemy.x)
+                new_projectile = Projectile(enemy.x, enemy.y, angle, enemy.color, screen)
+                projectiles.append(new_projectile)
+
         # collisions between artifacts and players
         if player.alive:
             collision_status = -1
@@ -156,6 +186,7 @@ def game_loop(screen):
 
             if collision_status == 1:
                 player.lose_electrons()
+                mass_bar.set_progress(player.mass / c.max_mass)
             elif collision_status == 2:
                 explosion = Explosion(player.x, player.y, player.radius, player.nucleus_color, screen)
                 animations.append(explosion)
@@ -189,13 +220,45 @@ def game_loop(screen):
                     explosion = Explosion(enemy.x, enemy.y, enemy.radius, enemy.color, screen)
                     animations.append(explosion)
 
+                    player.decrease_mass((1 + c.collision_collateral) * enemy.mass)
+                    mass_bar.set_progress(player.mass / c.max_mass)
+                    if player.alive == False:
+                        player_death_sound.play()
+                        explosion = Explosion(player.x, player.y, player.radius, player.nucleus_color, screen)
+                        animations.append(explosion)
+                        game_over_animation = explosion
+
         # collisions between enemies and projectiles
         for enemy in enemies:
             for projectile in projectiles:
-                if enemy_projectile_collision(projectile, enemy):
+                if projectile.color != enemy.color and enemy_projectile_collision(projectile, enemy):
                     enemy_hit_sound.play()
                     enemy.take_damage(c.damage_to_enemy)
                     projectiles.remove(projectile)
+
+        # collisions between player and projectile
+        if player.alive:
+            for projectile in projectiles:
+                if projectile.color != player.nucleus_color and player_projectile_collision(player, projectile):
+                    player_hit_sound.play()
+                    player.decrease_mass(c.damage_to_player)
+                    projectiles.remove(projectile)
+                    mass_bar.set_progress(player.mass / c.max_mass)
+                    if player.alive == False:
+                            player_death_sound.play()
+                            explosion = Explosion(player.x, player.y, player.radius, player.nucleus_color, screen)
+                            animations.append(explosion)
+                            game_over_animation = explosion
+
+        # collisions between projectiles
+        projectiles_to_be_removed = []
+        for projectile1, projectile2 in product(projectiles, projectiles):
+            if projectile1 != projectile2 and projectile_projectile_collision(projectile1, projectile2):
+                projectile1.active = False
+                projectile2.active = False
+                explosion = Explosion(projectile1.x, projectile1.y, 2 * c.projectile_radius, c.annihilation_color, screen)
+                explosion.final_step = 25
+                animations.append(explosion)
 
         for enemy in enemies:
             if enemy.alive == False:
@@ -220,6 +283,10 @@ def game_loop(screen):
             animation.render()
 
         title_text.render()
+        mass_text.render()
+        energy_text.render()
+
+        mass_bar.render()
 
         fps_string = "FPS: " + str(int(clock.get_fps()))
         fps_display = simple_font.render(fps_string, True, font_color)

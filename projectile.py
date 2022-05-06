@@ -11,6 +11,7 @@ class Projectile:
         self.theta = theta
 
         self.screen = screen
+        self.active = True
 
     def update(self):
         self.x += c.projectile_speed * c.dt * cos(self.theta)
