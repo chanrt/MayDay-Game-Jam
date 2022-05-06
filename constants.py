@@ -18,6 +18,7 @@ class Constants:
         self.nucleus_speed = 8
 
         self.horizontal_constrain = 50
+        self.vertical_constrain = 20
 
     def set_screen_size(self, screen):
         self.screen_width, self.screen_height = screen.get_size()

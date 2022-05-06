@@ -19,13 +19,8 @@ def game_loop(screen):
 
     bg_color = pg.Color(32, 32, 32)
     rect_color = pg.Color("red")
-    
-    top_rect = pg.Rect(0, 0, c.screen_width, c.border_thickness)
-    bottom_rect = pg.Rect(0, c.screen_height - c.border_thickness, c.screen_width, c.border_thickness)
 
     rects = []
-    rects.append(top_rect)
-    rects.append(bottom_rect)
 
     player = Player(6, screen)
 
