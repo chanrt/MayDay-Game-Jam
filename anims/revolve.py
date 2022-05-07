@@ -17,7 +17,7 @@ class Revolve:
         self.orbit_thickness = 2
 
         self.display = True
-        self.speed = 5
+        self.speed = 7
 
         self.angle = 0
 

@@ -49,6 +49,7 @@ class Constants:
         self.nucleus_speed_vertical = 480
         self.projectile_speed = 600
         self.enemy_speed = 150
+        self.artifact_slide_speed = 100
 
     def init_colors(self):
         self.normal_nucleus_color = pg.Color("#1f51ff")
@@ -62,9 +63,9 @@ class Constants:
     def init_damage(self):
         # damage
         self.damage_to_enemy = 1
-        self.damage_to_player = 0.5
-        self.collision_collateral = 0.1
-        self.mass_absorption = 0.8
+        self.damage_to_player = 1
+        self.collision_collateral = 0.2
+        self.mass_absorption = 0.5
 
         # enemy fire cycle
         self.enemy_fire_cycle = 100
