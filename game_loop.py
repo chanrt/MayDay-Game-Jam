@@ -50,6 +50,7 @@ def game_loop(screen):
     mass_bar.fg_color = dominant_color
     mass_bar.set_progress(player.mass / c.max_mass)
     energy_bar = ProgressBar(3 * c.screen_width // 4, below_indicator, c.screen_width // 4, c.progress_bar_thickness, screen)
+    energy_bar.set_progress(player.energy / c.max_energy)
     energy_bar.fg_color = dominant_color
 
     # sounds
@@ -58,6 +59,7 @@ def game_loop(screen):
     enemy_hit_sound = pg.mixer.Sound(get_resource_path("sounds/enemy_hit.wav"))
     enemy_death_sound = pg.mixer.Sound(get_resource_path("sounds/enemy_death.wav"))
     enemy_shoot_sound = pg.mixer.Sound(get_resource_path("sounds/enemy_shoot.wav"))
+    energy_from_mass_sound = pg.mixer.Sound(get_resource_path("sounds/energy_from_mass.wav"))
     player_shoot_sound = pg.mixer.Sound(get_resource_path("sounds/player_shoot.wav"))
     player_shoot_sound.set_volume(0.2)
     player_death_sound = pg.mixer.Sound(get_resource_path("sounds/player_death.wav"))
@@ -136,11 +138,9 @@ def game_loop(screen):
                 if event.key == pg.K_q:
                     # CHEAT
                     player.increase_mass(0.2)
-                    mass_bar.set_progress(player.mass / c.max_mass)
                 if event.key == pg.K_e:
                     # CHEAT
                     player.decrease_mass(0.2)
-                    mass_bar.set_progress(player.mass / c.max_mass)
 
             if event.type == pg.MOUSEBUTTONDOWN:
                 if event.button == 1:
@@ -150,7 +150,11 @@ def game_loop(screen):
                     angle = atan2(mouse_y - player.y, mouse_x - player.x)
                     new_projectile = Projectile(player.x, player.y, angle, player.nucleus_color, screen)
                     projectiles.append(new_projectile)
+                    player.decrease_energy(c.energy_per_shot)
 
+                    if player.converting_mass_to_energy and player.convert_energy_cycle == 0:
+                        energy_from_mass_sound.play()
+                    
             if event.type == pg.QUIT:
                 pg.quit()
                 quit()
@@ -166,6 +170,9 @@ def game_loop(screen):
             projectile.update()
         for animation in animations:
             animation.update()
+
+        mass_bar.set_progress(player.mass / c.max_mass)
+        energy_bar.set_progress(player.energy / c.max_energy)
 
         # see if any enemy is ready to fire
         for enemy in enemies:
@@ -235,6 +242,10 @@ def game_loop(screen):
                     enemy.take_damage(c.damage_to_enemy)
                     projectiles.remove(projectile)
 
+                    if player.mass <= c.max_nucleons * c.nucleon_mass:
+                        player.increase_mass(c.mass_absorption * enemy.mass)
+                        mass_bar.set_progress(player.mass / c.max_mass)
+
         # collisions between player and projectile
         if player.alive:
             for projectile in projectiles:
@@ -250,7 +261,6 @@ def game_loop(screen):
                             game_over_animation = explosion
 
         # collisions between projectiles
-        projectiles_to_be_removed = []
         for projectile1, projectile2 in product(projectiles, projectiles):
             if projectile1 != projectile2 and projectile_projectile_collision(projectile1, projectile2):
                 projectile1.active = False
@@ -286,6 +296,7 @@ def game_loop(screen):
         energy_text.render()
 
         mass_bar.render()
+        energy_bar.render()
 
         fps_string = "FPS: " + str(int(clock.get_fps()))
         fps_display = simple_font.render(fps_string, True, font_color)

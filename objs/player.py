@@ -32,27 +32,42 @@ class Player:
                                                 50, c.ripples_color, screen)
         self.calculate_radius()
 
+        self.energy = 100
+        self.converting_mass_to_energy = False
+        self.convert_energy_cycle = 0
+
         self.alive = True
 
     def update(self, keys_pressed):
         if self.alive:
-            horizontal_speed, vertical_speed = 0, 0
+            front_speed, back_speed, vertical_speed = 0, 0, 0
             if self.num_electrons > 0:
-                horizontal_speed = c.atom_speed_horizontal
+                front_speed = c.atom_speed_front
+                back_speed = c.atom_speed_back
                 vertical_speed = c.atom_speed_vertical
             else:
-                horizontal_speed = c.nucleus_speed_horizontal
+                front_speed = c.nucleus_speed_front
+                back_speed = c.nucleus_speed_back
                 vertical_speed = c.nucleus_speed_vertical
 
             if keys_pressed[pg.K_LEFT] or keys_pressed[pg.K_a]:
-                self.x -= horizontal_speed * c.dt
+                self.x -= back_speed * c.dt
             if keys_pressed[pg.K_RIGHT] or keys_pressed[pg.K_d]:
-                self.x += horizontal_speed * c.dt
+                self.x += front_speed * c.dt
             if keys_pressed[pg.K_UP] or keys_pressed[pg.K_w]:
                 self.y -= vertical_speed * c.dt
             if keys_pressed[pg.K_DOWN] or keys_pressed[pg.K_s]:
                 self.y += vertical_speed * c.dt
 
+            if self.converting_mass_to_energy:
+                self.increase_energy(c.max_energy / c.energy_increase_cycle)
+                self.convert_energy_cycle += 1
+
+                if self.convert_energy_cycle == c.energy_increase_cycle:
+                    self.convert_energy_cycle = 0
+                    self.converting_mass_to_energy = False
+            else:
+                self.increase_energy(c.energy_replenish_rate * c.dt)
             self.constrain_player()
             self.update_animations()
 
@@ -85,6 +100,18 @@ class Player:
             self.radius = 0
         else:
             self.calculate_radius()
+
+    def increase_energy(self, energy):
+        self.energy += energy
+        if self.energy > c.max_energy:
+            self.energy = c.max_energy
+
+    def decrease_energy(self, energy):
+        self.energy -= energy
+        if self.energy < 0:
+            if self.mass > c.mass_energy_refill:
+                self.decrease_mass(c.mass_energy_refill)
+                self.converting_mass_to_energy = True
 
     def lose_electrons(self):
         self.mass = self.mass - self.num_electrons * c.electron_mass

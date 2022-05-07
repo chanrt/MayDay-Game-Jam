@@ -6,6 +6,8 @@ class Constants:
         self.init_fps()
         self.init_colors()
         self.init_speeds()
+        self.init_damage()
+        self.init_probabilities()
 
         # mass
         self.density = 0.0001
@@ -33,27 +35,17 @@ class Constants:
         # artifact
         self.artifact_width = 15
 
-        # spawn probabilities
-        self.enemy_probability = 0.7
-        self.artifact_probability = 0.7
-
-        # damage
-        self.damage_to_enemy = 1
-        self.damage_to_player = 0.5
-        self.collision_collateral = 0.1
-
-        # enemy fire cycle
-        self.enemy_fire_cycle = 100
-
     def init_fps(self):
         self.fps = 120
         self.dt = 1 / self.fps
 
     def init_speeds(self):
         self.scroll_speed = 300
-        self.atom_speed_horizontal = 150
+        self.atom_speed_front = 150
+        self.atom_speed_back = 200
         self.atom_speed_vertical = 300
-        self.nucleus_speed_horizontal = 240
+        self.nucleus_speed_front = 240
+        self.nucleus_speed_back = 300
         self.nucleus_speed_vertical = 480
         self.projectile_speed = 600
         self.enemy_speed = 150
@@ -67,18 +59,26 @@ class Constants:
         self.artifact_color = pg.Color("yellow")
         self.annihilation_color = pg.Color("white")
 
-    def init_ui(self):
-        # font size
-        self.title_font_size = int(self.screen_height / 25)
-        self.indicator_font_size = int(self.screen_height / 40)
+    def init_damage(self):
+        # damage
+        self.damage_to_enemy = 1
+        self.damage_to_player = 0.5
+        self.collision_collateral = 0.1
+        self.mass_absorption = 0.8
 
-        # progress bar
-        self.progress_bar_thickness = 10
+        # enemy fire cycle
+        self.enemy_fire_cycle = 100
 
-        # buttons
-        self.button_font_size = self.screen_height // 30
-        self.button_width = self.screen_width // 5
-        self.button_height = self.screen_height // 15
+        # energy
+        self.mass_energy_refill = 1
+        self.energy_increase_cycle =100
+        self.max_energy = 100
+        self.energy_per_shot = 5
+        self.energy_replenish_rate = 0.5
+
+    def init_probabilities(self):
+        self.enemy_probability = 0.7
+        self.artifact_probability = 0.7
 
     def set_screen_size(self, screen):
         self.screen_width, self.screen_height = screen.get_size()
@@ -91,5 +91,18 @@ class Constants:
 
     def set_dt(self, dt):
         self.dt = dt
+
+    def init_ui(self):
+        # font size
+        self.title_font_size = int(self.screen_height / 25)
+        self.indicator_font_size = int(self.screen_height / 40)
+
+        # progress bar
+        self.progress_bar_thickness = 10
+
+        # buttons
+        self.button_font_size = self.screen_height // 30
+        self.button_width = self.screen_width // 5
+        self.button_height = self.screen_height // 15
 
 consts = Constants()
