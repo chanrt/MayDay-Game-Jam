@@ -91,6 +91,8 @@ def game_loop(screen, matter="normal"):
     spawn_enemy = pg.USEREVENT + 2
     pg.time.set_timer(spawn_enemy, 1500)
 
+    paused = 0
+
     while True:
         clock.tick(120)
 
@@ -132,6 +134,8 @@ def game_loop(screen, matter="normal"):
 
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
+                    c.pause_menu_sound.play()
+                    paused = 2
                     user_input = pause_screen(screen)
                     if user_input == "quit":
                         return
@@ -176,18 +180,18 @@ def game_loop(screen, matter="normal"):
                 quit()
 
         # updates
-        player.update(keys_pressed)
-
-        for animation in animations:
-            animation.update()
-        for artifact in artifacts:
-            artifact.update()
-        for enemy in enemies:
-            enemy.update(player, artifacts)
-        for powerup in powerups:
-            powerup.update()
-        for projectile in projectiles:
-            projectile.update()
+        if not paused:
+            player.update(keys_pressed)
+            for animation in animations:
+                animation.update()
+            for artifact in artifacts:
+                artifact.update()
+            for enemy in enemies:
+                enemy.update(player, artifacts)
+            for powerup in powerups:
+                powerup.update()
+            for projectile in projectiles:
+                projectile.update()
         
         mass_bar.set_progress(player.mass / c.max_mass)
         energy_bar.set_progress(player.energy / c.max_energy)
@@ -338,8 +342,11 @@ def game_loop(screen, matter="normal"):
         # flip display
         pg.display.flip()
 
-        c.set_dt(clock.get_time() / 1000)
-
+        if not paused:
+            c.set_dt(clock.get_time() / 1000)
+        else:
+            paused -= 1
+            c.set_dt(0)
 
 if __name__ == '__main__':
     pg.init()

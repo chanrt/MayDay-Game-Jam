@@ -109,12 +109,16 @@ def main_menu(screen):
                 exit_button.check_clicked(mouse_pos, click)
 
                 if play_button.left_clicked:
+                    c.start_game_sound.play()
                     return "play"
                 elif instruction_button.left_clicked:
+                    c.button_clicked_sound.play()
                     return "instructions"
                 elif about_button.left_clicked:
+                    c.button_clicked_sound.play()
                     return "about"
                 elif exit_button.left_clicked:
+                    c.button_clicked_sound.play()
                     return "exit"
             if event.type == pg.MOUSEBUTTONUP:
                 mouse_pos = pg.mouse.get_pos()

@@ -3,6 +3,8 @@ import pygame as pg
 
 class Constants:
     def __init__(self):
+        pg.init()
+
         self.init_fps()
         self.init_masses()
         self.init_numbers()
@@ -12,6 +14,7 @@ class Constants:
         self.init_damage()
         self.init_probabilities()
         self.init_powerups()
+        self.init_sounds()
 
         # constrains
         self.horizontal_constrain = 50
@@ -92,6 +95,12 @@ class Constants:
     def init_powerups(self):
         self.higgs_mass_cutoff = 0.4 * self.max_mass
         self.higgs_mass_gain = 0.25 * self.max_mass
+
+    def init_sounds(self):
+        self.button_clicked_sound = pg.mixer.Sound("sounds/button_press.wav")
+        self.start_game_sound = pg.mixer.Sound("sounds/start_game.wav")
+        self.main_menu_sound = pg.mixer.Sound("sounds/main_menu.wav")
+        self.pause_menu_sound = pg.mixer.Sound("sounds/pause_menu.wav")
 
     def set_screen_size(self, screen):
         self.screen_width, self.screen_height = screen.get_size()

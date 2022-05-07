@@ -32,7 +32,7 @@ def pause_screen(screen):
                 quit()
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
-                    return
+                    return "resume"
             if event.type == pg.MOUSEMOTION:
                 mouse_pos = pg.mouse.get_pos()
                 resume_button.update(mouse_pos)
@@ -46,10 +46,13 @@ def pause_screen(screen):
                 quit_button.check_clicked(mouse_pos, click)
 
                 if resume_button.left_clicked:
+                    c.button_clicked_sound.play()
                     return "resume"
                 elif restart_button.left_clicked:
+                    c.start_game_sound.play()
                     return "restart"
                 elif quit_button.left_clicked:
+                    c.main_menu_sound.play()
                     return "quit"
 
             if event.type == pg.MOUSEBUTTONUP:
