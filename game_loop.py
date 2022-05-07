@@ -3,16 +3,16 @@ from math import atan2
 from random import random
 import pygame as pg
 
-from artifacts import Artifact
+from objs.artifacts import Artifact
 from collisions import *
 from constants import consts as c
-from enemy import Enemy
-from explosion import Explosion
+from objs.enemy import Enemy
+from anims.explosion import Explosion
 from load_data import get_resource_path
-from player import Player
-from progress_bar import ProgressBar
-from projectile import Projectile
-from text import Text
+from objs.player import Player
+from ui.progress_bar import ProgressBar
+from objs.projectile import Projectile
+from ui.text import Text
 
 
 def game_loop(screen):

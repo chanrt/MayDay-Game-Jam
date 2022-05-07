@@ -2,14 +2,14 @@ from itertools import product
 from math import radians
 import pygame as pg
 
-from button import Button
+from ui.button import Button
 from collisions import projectile_projectile_collision
 from constants import consts as c
-from explosion import Explosion
+from anims.explosion import Explosion
 from load_data import get_resource_path
-from projectile import Projectile
+from objs.projectile import Projectile
 from random import randint, random
-from text import Text
+from ui.text import Text
 
 def make_new_projectiles(screen):
     panel = randint(0, 3)
