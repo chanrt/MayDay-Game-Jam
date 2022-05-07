@@ -131,8 +131,7 @@ def game_loop(screen, matter="normal"):
 
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
-                    pg.quit()
-                    quit()
+                    return
                 if event.key == pg.K_q:
                     # CHEAT
                     player.increase_mass(0.2)

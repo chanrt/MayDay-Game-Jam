@@ -86,11 +86,11 @@ class Constants:
 
     def init_probabilities(self):
         self.enemy_probability = 0.7
-        self.artifact_probability = 0.7
-        self.higgs_probability = 1
+        self.artifact_probability = 0.6
+        self.higgs_probability = 0.25
 
     def init_powerups(self):
-        self.higgs_mass_cutoff = self.max_mass
+        self.higgs_mass_cutoff = 0.4 * self.max_mass
         self.higgs_mass_gain = 0.25 * self.max_mass
 
     def set_screen_size(self, screen):
