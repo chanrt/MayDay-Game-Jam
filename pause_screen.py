@@ -53,6 +53,8 @@ def pause_screen(screen):
                     return "restart"
                 elif quit_button.left_clicked:
                     c.main_menu_sound.play()
+                    pg.mixer.music.load(get_resource_path("music/menu.mp3"))
+                    pg.mixer.music.play()
                     return "quit"
 
             if event.type == pg.MOUSEBUTTONUP:

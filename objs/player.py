@@ -38,6 +38,10 @@ class Player:
 
         self.alive = True
 
+    def reset_position(self):
+        self.x = c.screen_width / 5
+        self.y = c.screen_height / 2
+
     def change_matter(self):
         if self.matter == "normal":
             self.matter = "anti"
@@ -86,7 +90,11 @@ class Player:
                     self.convert_energy_cycle = 0
                     self.converting_mass_to_energy = False
             else:
-                self.increase_energy(c.energy_replenish_rate * c.dt)
+                energy_increase = c.energy_replenish_rate * c.dt
+                if self.num_electrons > 0:
+                    self.increase_energy(c.atom_rate_multiplicative * energy_increase)
+                else:
+                    self.increase_energy(energy_increase)
             self.constrain_player()
             self.update_animations()
 

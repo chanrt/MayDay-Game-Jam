@@ -55,6 +55,10 @@ def game_loop(screen, matter="normal"):
     energy_bar.set_progress(player.energy / c.max_energy)
     energy_bar.fg_color = dominant_color
 
+    # music
+    bg_music = pg.mixer.music.load(get_resource_path("music/game.mp3"))
+    pg.mixer.music.play(-1)
+
     # sounds
     artifact_enemy_collision_sound = pg.mixer.Sound(get_resource_path("sounds/artifact_enemy_collision.wav"))
     enemy_player_collision_sound = pg.mixer.Sound(get_resource_path("sounds/enemy_player_collision.wav"))
@@ -63,6 +67,7 @@ def game_loop(screen, matter="normal"):
     enemy_shoot_sound = pg.mixer.Sound(get_resource_path("sounds/enemy_shoot.wav"))
     energy_from_mass_sound = pg.mixer.Sound(get_resource_path("sounds/energy_from_mass.wav"))
     higgs_sound = pg.mixer.Sound(get_resource_path("sounds/higgs.wav"))
+    matter_change_sound = pg.mixer.Sound(get_resource_path("sounds/matter_change.wav"))
     player_shoot_sound = pg.mixer.Sound(get_resource_path("sounds/player_shoot.wav"))
     player_shoot_sound.set_volume(0.2)
     player_death_sound = pg.mixer.Sound(get_resource_path("sounds/player_death.wav"))
@@ -99,7 +104,26 @@ def game_loop(screen, matter="normal"):
         # check game over
         if game_over_animation is not None:
             if not game_over_animation.display:
-                return
+                game_over_animation = None
+                matter_change_sound.play()
+
+                current_matter = "anti" if current_matter == "normal" else "normal"
+                opposite_matter = "anti" if opposite_matter == "normal" else "normal"
+                dominant_color = c.normal_nucleus_color if current_matter == "normal" else c.anti_nucleus_color
+
+                player.change_matter()
+                player.reset_position()
+
+                for artifact in artifacts:
+                    if abs(artifact.x - player.x) < c.screen_width // 2:
+                        artifacts.remove(artifact)
+
+                for enemy in enemies:
+                    enemy.change_matter()
+                for projectile in projectiles:
+                    projectile.change_matter()
+                mass_bar.fg_color = dominant_color
+                energy_bar.fg_color = dominant_color
 
         for animation in animations:
             if not animation.display:
@@ -137,6 +161,11 @@ def game_loop(screen, matter="normal"):
                     c.pause_menu_sound.play()
                     paused = 2
                     user_input = pause_screen(screen)
+                    if user_input != "resume":
+                        animations = []
+                        artifacts = []
+                        enemies = []
+                        projectiles = []
                     if user_input == "quit":
                         return
                     elif user_input == "restart":
@@ -148,19 +177,6 @@ def game_loop(screen, matter="normal"):
                 if event.key == pg.K_e:
                     # CHEAT
                     player.decrease_mass(0.2)
-                if event.key == pg.K_f:
-                    # CHEAT
-                    current_matter = "anti" if current_matter == "normal" else "normal"
-                    opposite_matter = "anti" if opposite_matter == "normal" else "normal"
-                    dominant_color = c.normal_nucleus_color if current_matter == "normal" else c.anti_nucleus_color
-
-                    player.change_matter()
-                    for enemy in enemies:
-                        enemy.change_matter()
-                    for projectile in projectiles:
-                        projectile.change_matter()
-                    mass_bar.fg_color = dominant_color
-                    energy_bar.fg_color = dominant_color
 
             if event.type == pg.MOUSEBUTTONDOWN:
                 if event.button == 1:

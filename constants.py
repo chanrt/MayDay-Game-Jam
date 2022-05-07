@@ -78,7 +78,7 @@ class Constants:
         self.mass_absorption = 0.5
 
         # enemy fire cycle
-        self.enemy_fire_cycle = 100
+        self.enemy_fire_cycle = 60
 
         # energy parameters
         self.mass_energy_refill = 1
@@ -86,14 +86,15 @@ class Constants:
         self.max_energy = 100
         self.energy_per_shot = 5
         self.energy_replenish_rate = 0.5
+        self.atom_rate_multiplicative = 5
 
     def init_probabilities(self):
         self.enemy_probability = 0.7
         self.artifact_probability = 0.6
-        self.higgs_probability = 0.25
+        self.higgs_probability = 0.33
 
     def init_powerups(self):
-        self.higgs_mass_cutoff = 0.4 * self.max_mass
+        self.higgs_mass_cutoff = 0.5 * self.max_mass
         self.higgs_mass_gain = 0.25 * self.max_mass
 
     def init_sounds(self):

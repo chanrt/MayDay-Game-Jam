@@ -1,5 +1,6 @@
 Animations:
 1) The animation scripts in the anim folder are from my own repository: https://github.com/chanrt/pygame-anim
+   It handles common animations like ripples, explosions, etc.
    If people can use inbuilt animations in game engines then why can't I?
 
 Fonts:
@@ -9,9 +10,26 @@ Images:
 1) Splash image on loading screen from freepik.com
    <a href='https://www.freepik.com/vectors/atom'>Atom vector created by rawpixel.com - www.freepik.com</a>
 
+Music:
+1) Game background:
+   Limit 70 by Kevin MacLeod
+   Link: https://incompetech.filmmusic.io/song/5710-limit-70
+   License: https://filmmusic.io/standard-license
+2) Menu background:
+   Pamgaea by Kevin MacLeod
+   Link: https://incompetech.filmmusic.io/song/4193-pamgaea
+   License: https://filmmusic.io/standard-license
+
+Packages:
+1) Pygame: https://www.pygame.org/
+
+Programming langauge:
+1) Python: https://www.python.org/
+
 Sounds:
 1) All SFX sounds generated from https://sfxr.me
 
 UI:
 1) The UI scripts in the UI folder are from my own repository: https://github.com/chanrt/pygame-ui
+   It manages common UI elements like buttons, text, etc.
    If people can use inbuilt UI features in game engines then why can't I?
