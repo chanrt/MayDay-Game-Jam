@@ -3,27 +3,9 @@ import pygame as pg
 
 class Constants:
     def __init__(self):
-        # FPS
-        self.fps = 120
-        self.dt = 1 / self.fps
-
-        # speeds
-        self.scroll_speed = 300
-        self.atom_speed_horizontal = 150
-        self.atom_speed_vertical = 300
-        self.nucleus_speed_horizontal = 240
-        self.nucleus_speed_vertical = 480
-        self.projectile_speed = 600
-        self.enemy_speed = 150
-        
-        # colors
-        self.normal_nucleus_color = pg.Color("#1f51ff")
-        self.normal_electron_color = pg.Color("white")
-        self.anti_nucleus_color = pg.Color("red")
-        self.anti_electron_color = pg.Color("purple")
-        self.ripples_color = pg.Color("green")
-        self.artifact_color = pg.Color("yellow")
-        self.annihilation_color = pg.Color("white")
+        self.init_fps()
+        self.init_colors()
+        self.init_speeds()
 
         # mass
         self.density = 0.0001
@@ -63,8 +45,40 @@ class Constants:
         # enemy fire cycle
         self.enemy_fire_cycle = 100
 
+    def init_fps(self):
+        self.fps = 120
+        self.dt = 1 / self.fps
+
+    def init_speeds(self):
+        self.scroll_speed = 300
+        self.atom_speed_horizontal = 150
+        self.atom_speed_vertical = 300
+        self.nucleus_speed_horizontal = 240
+        self.nucleus_speed_vertical = 480
+        self.projectile_speed = 600
+        self.enemy_speed = 150
+
+    def init_colors(self):
+        self.normal_nucleus_color = pg.Color("#1f51ff")
+        self.normal_electron_color = pg.Color("white")
+        self.anti_nucleus_color = pg.Color("red")
+        self.anti_electron_color = pg.Color("purple")
+        self.ripples_color = pg.Color("green")
+        self.artifact_color = pg.Color("yellow")
+        self.annihilation_color = pg.Color("white")
+
+    def init_ui(self):
+        # font size
+        self.title_font_size = int(self.screen_height / 25)
+        self.indicator_font_size = int(self.screen_height / 40)
+
         # progress bar
         self.progress_bar_thickness = 10
+
+        # buttons
+        self.button_font_size = self.screen_height // 30
+        self.button_width = self.screen_width // 5
+        self.button_height = self.screen_height // 15
 
     def set_screen_size(self, screen):
         self.screen_width, self.screen_height = screen.get_size()
@@ -72,8 +86,8 @@ class Constants:
         # quantities that required screen size for calculation
         self.border_thickness = self.screen_height / 20
         self.artifact_height = self.screen_height / 4
-        self.title_font_size = int(self.screen_height / 25)
-        self.indicator_font_size = int(self.screen_height / 40)
+        
+        self.init_ui()
 
     def set_dt(self, dt):
         self.dt = dt

@@ -89,9 +89,8 @@ def game_loop(screen):
         # check game over
         if game_over_animation is not None:
             if not game_over_animation.display:
-                pg.quit()
-                quit()
-
+                return
+                
         # clean artifacts
         for artifact in artifacts:
             if artifact.outside_screen():

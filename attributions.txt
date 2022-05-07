@@ -1,3 +1,7 @@
+Images:
+1) Splash image on loading screen from freepik.com
+<a href='https://www.freepik.com/vectors/atom'>Atom vector created by rawpixel.com - www.freepik.com</a>
+
 Sounds:
 1) artifact_collision.wav, player_shoot.wav and ricochet.wav generated from https://sfxr.me
 
