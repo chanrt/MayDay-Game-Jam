@@ -8,6 +8,7 @@ from collisions import *
 from constants import consts as c
 from objs.enemy import Enemy
 from anims.explosion import Explosion
+from powerups.higgs_field import HiggsField
 from load_data import get_resource_path
 from objs.player import Player
 from ui.progress_bar import ProgressBar
@@ -60,24 +61,28 @@ def game_loop(screen, matter="normal"):
     enemy_death_sound = pg.mixer.Sound(get_resource_path("sounds/enemy_death.wav"))
     enemy_shoot_sound = pg.mixer.Sound(get_resource_path("sounds/enemy_shoot.wav"))
     energy_from_mass_sound = pg.mixer.Sound(get_resource_path("sounds/energy_from_mass.wav"))
+    higgs_sound = pg.mixer.Sound(get_resource_path("sounds/higgs.wav"))
     player_shoot_sound = pg.mixer.Sound(get_resource_path("sounds/player_shoot.wav"))
     player_shoot_sound.set_volume(0.2)
     player_death_sound = pg.mixer.Sound(get_resource_path("sounds/player_death.wav"))
     player_hit_sound = pg.mixer.Sound(get_resource_path("sounds/player_hit.wav"))
     ricochet_sound = pg.mixer.Sound(get_resource_path("sounds/ricochet.wav"))
 
+    # animations
+    animations = []
+    game_over_animation = None
+
     # artifacts
     artifacts = []
-
-    # projectiles
-    projectiles = []
 
     # enemies
     enemies = []
 
-    # animations
-    animations = []
-    game_over_animation = None
+    # powerups
+    powerups = []
+
+    # projectiles
+    projectiles = []
 
     # game events
     spawn_artifact = pg.USEREVENT + 1
@@ -92,23 +97,16 @@ def game_loop(screen, matter="normal"):
         if game_over_animation is not None:
             if not game_over_animation.display:
                 return
-                
-        # clean artifacts
-        for artifact in artifacts:
-            if artifact.outside_screen():
-                artifacts.remove(artifact)
 
-        # clear animations
         for animation in animations:
             if not animation.display:
                 animations.remove(animation)
-
-        # clean enemies
+        for artifact in artifacts:
+            if artifact.outside_screen():
+                artifacts.remove(artifact)
         for enemy in enemies:
             if enemy.outside_screen():
                 enemies.remove(enemy)
-
-        # clean projectiles
         for projectile in projectiles:
             if projectile.outside_screen() or projectile.active == False:
                 projectiles.remove(projectile)        
@@ -175,15 +173,17 @@ def game_loop(screen, matter="normal"):
         # updates
         player.update(keys_pressed)
 
+        for animation in animations:
+            animation.update()
         for artifact in artifacts:
             artifact.update()
         for enemy in enemies:
             enemy.update(player, artifacts)
+        for powerup in powerups:
+            powerup.update()
         for projectile in projectiles:
             projectile.update()
-        for animation in animations:
-            animation.update()
-
+        
         mass_bar.set_progress(player.mass / c.max_mass)
         energy_bar.set_progress(player.energy / c.max_energy)
 
@@ -195,11 +195,21 @@ def game_loop(screen, matter="normal"):
                 new_projectile = Projectile(enemy.x, enemy.y, angle, enemy.color, screen)
                 projectiles.append(new_projectile)
 
+        # collisions between artifacts and enemies
+        for artifact in artifacts:
+            for enemy in enemies:
+                if artifact_enemy_collision(artifact, enemy):
+                    artifact_enemy_collision_sound.play()
+                    explosion = Explosion(enemy.x, enemy.y, enemy.radius,
+                                          enemy.color, screen)
+                    animations.append(explosion)
+                    enemies.remove(enemy)
+
         # collisions between artifacts and players
         if player.alive:
             collision_status = -1
             for artifact in artifacts:
-                collision_status = player_artifact_collision(player, artifact)
+                collision_status = artifact_player_collision(artifact, player)
                 if collision_status != 0:
                     break
 
@@ -216,24 +226,14 @@ def game_loop(screen, matter="normal"):
         # collisions between artifacts and projectiles
         for artifact in artifacts:
             for projectile in projectiles:
-                if projectile_artifact_collision(projectile, artifact):
+                if artifact_projectile_collision(artifact, projectile):
                     ricochet_sound.play()
                     projectiles.remove(projectile)
 
-        # collisions between artifacts and enemies
-        for artifact in artifacts:
-            for enemy in enemies:
-                if enemy_artifact_collision(enemy, artifact):
-                    artifact_enemy_collision_sound.play()
-                    explosion = Explosion(enemy.x, enemy.y, enemy.radius,
-                                          enemy.color, screen)
-                    animations.append(explosion)
-                    enemies.remove(enemy)
-
-        # collisions between player and enemies
+        # collisions between enemies and player
         if player.alive:
             for enemy in enemies:
-                if player_enemy_collision(player, enemy):
+                if enemy_player_collision(enemy, player):
                     enemy_player_collision_sound.play()
                     enemies.remove(enemy)
                     explosion = Explosion(enemy.x, enemy.y, enemy.radius, enemy.color, screen)
@@ -250,7 +250,7 @@ def game_loop(screen, matter="normal"):
         # collisions between enemies and projectiles
         for enemy in enemies:
             for projectile in projectiles:
-                if projectile.color != enemy.color and enemy_projectile_collision(projectile, enemy):
+                if projectile.color != enemy.color and enemy_projectile_collision(enemy, projectile):
                     enemy_hit_sound.play()
                     enemy.take_damage(c.damage_to_enemy)
                     projectiles.remove(projectile)
@@ -258,8 +258,17 @@ def game_loop(screen, matter="normal"):
                     if player.mass <= c.max_nucleons * c.nucleon_mass:
                         player.increase_mass(c.mass_absorption * enemy.mass)
                         mass_bar.set_progress(player.mass / c.max_mass)
+        
+        # collisions between player and powerups
+        if player.alive:
+            for powerup in powerups:
+                if player_powerup_collision(player, powerup):
+                    powerups.remove(powerup)
+                    if isinstance(powerup, HiggsField):
+                        higgs_sound.play()
+                        player.increase_mass(c.higgs_mass_gain)
 
-        # collisions between player and projectile
+        # collisions between player and projectiles
         if player.alive:
             for projectile in projectiles:
                 if projectile.color != player.nucleus_color and player_projectile_collision(player, projectile):
@@ -282,6 +291,7 @@ def game_loop(screen, matter="normal"):
                 explosion.final_step = 25
                 animations.append(explosion)
 
+        # remove dead enemies and consider spawning powerups/pickups
         for enemy in enemies:
             if enemy.alive == False:
                 enemy_death_sound.play()
@@ -289,27 +299,32 @@ def game_loop(screen, matter="normal"):
                 animations.append(explosion)
                 enemies.remove(enemy)
 
+                if player.mass < c.higgs_mass_cutoff and random() < c.higgs_probability:
+                    higgs_field = HiggsField(enemy.x, enemy.y, screen)
+                    powerups.append(higgs_field)
+
         # clear screen
         screen.fill(bg_color)
 
         # render
         player.render()
-
+        for animation in animations:
+            animation.render()
         for artifact in artifacts:
             artifact.render()
         for enemy in enemies:
             enemy.render()
+        for powerup in powerups:
+            powerup.render()
         for projectile in projectiles:
             projectile.render()
-        for animation in animations:
-            animation.render()
 
+        energy_text.render()
         title_text.render()
         mass_text.render()
-        energy_text.render()
-
-        mass_bar.render()
+        
         energy_bar.render()
+        mass_bar.render()
 
         fps_string = "FPS: " + str(int(clock.get_fps()))
         fps_display = simple_font.render(fps_string, True, font_color)

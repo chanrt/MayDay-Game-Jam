@@ -4,29 +4,14 @@ import pygame as pg
 class Constants:
     def __init__(self):
         self.init_fps()
+        self.init_masses()
+        self.init_numbers()
+        self.init_radii()
         self.init_colors()
         self.init_speeds()
         self.init_damage()
         self.init_probabilities()
-
-        # mass
-        self.density = 0.0001
-        self.nucleon_mass = 1
-        self.electron_mass = 0.2
-
-        # radii
-        self.electron_radius = 6
-        self.projectile_radius = 4
-
-        # maxs
-        self.max_nucleons = 12
-        self.max_electrons = 6
-        self.max_nuclear_radius = pow(self.max_nucleons * self.nucleon_mass / (4 * pi * self.density), 1/3)
-        self.max_mass = self.max_nucleons * self.nucleon_mass + self.max_electrons * self.electron_mass
-
-        # enemy mass range
-        self.max_enemy_mass = 4
-        self.min_enemy_mass = 0.33
+        self.init_powerups()
 
         # constrains
         self.horizontal_constrain = 50
@@ -38,6 +23,26 @@ class Constants:
     def init_fps(self):
         self.fps = 120
         self.dt = 1 / self.fps
+
+    def init_masses(self):
+        self.density = 0.0001
+        self.nucleon_mass = 1
+        self.electron_mass = 0.2
+
+        self.max_enemy_mass = 4
+        self.min_enemy_mass = 0.33
+
+    def init_numbers(self):
+        self.max_nucleons = 12
+        self.max_electrons = 6
+        self.max_nuclear_radius = pow(self.max_nucleons * self.nucleon_mass / (4 * pi * self.density), 1/3)
+        self.max_mass = self.max_nucleons * self.nucleon_mass + self.max_electrons * self.electron_mass
+
+    def init_radii(self):
+        self.electron_radius = 6
+        self.projectile_radius = 4
+
+        self.higgs_radius = 50
 
     def init_speeds(self):
         self.scroll_speed = 300
@@ -61,16 +66,18 @@ class Constants:
         self.annihilation_color = pg.Color("white")
 
     def init_damage(self):
-        # damage
+        # damage intensities
         self.damage_to_enemy = 1
         self.damage_to_player = 1
+
+        # damage parameters
         self.collision_collateral = 0.2
         self.mass_absorption = 0.5
 
         # enemy fire cycle
         self.enemy_fire_cycle = 100
 
-        # energy
+        # energy parameters
         self.mass_energy_refill = 1
         self.energy_increase_cycle =100
         self.max_energy = 100
@@ -80,6 +87,11 @@ class Constants:
     def init_probabilities(self):
         self.enemy_probability = 0.7
         self.artifact_probability = 0.7
+        self.higgs_probability = 1
+
+    def init_powerups(self):
+        self.higgs_mass_cutoff = self.max_mass
+        self.higgs_mass_gain = 0.25 * self.max_mass
 
     def set_screen_size(self, screen):
         self.screen_width, self.screen_height = screen.get_size()

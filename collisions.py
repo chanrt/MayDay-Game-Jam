@@ -1,7 +1,7 @@
 from constants import consts as c
 
 
-def player_artifact_collision(player, artifact):
+def artifact_player_collision(artifact, player):
     rect = artifact.rect
     if player.num_electrons > 0:
         if player.x - 2 * player.radius < rect.x + rect.width and player.x + 2 * player.radius > rect.x:
@@ -13,27 +13,37 @@ def player_artifact_collision(player, artifact):
                 return 2
     return 0
 
-def projectile_artifact_collision(projectile, artifact):
+def artifact_projectile_collision(artifact, projectile):
     rect = artifact.rect
     if projectile.x < rect.x + rect.width and projectile.x > rect.x:
         if projectile.y < rect.y + rect.height and projectile.y > rect.y:
             return True
     return False
 
-def enemy_artifact_collision(enemy, artifact):
+def artifact_enemy_collision(artifact, enemy):
     rect = artifact.rect
     if enemy.x < rect.x + rect.width and enemy.x > rect.x:
         if enemy.y < rect.y + rect.height and enemy.y > rect.y:
             return True
     return False
 
-def player_enemy_collision(player, enemy):
+def enemy_player_collision(enemy, player):
     if distance_between(player, enemy) < player.radius:
         return True
     return False
 
-def enemy_projectile_collision(projectile, enemy):
+def enemy_powerup_collision(enemy, powerup):
+    if distance_between(enemy, powerup) < enemy.radius + powerup.radius:
+        return True
+    return False
+
+def enemy_projectile_collision(enemy, projectile):
     if distance_between(projectile, enemy) < c.projectile_radius + enemy.radius:
+        return True
+    return False
+
+def player_powerup_collision(player, powerup):
+    if distance_between(player, powerup) < player.radius + powerup.radius:
         return True
     return False
 
