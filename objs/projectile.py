@@ -4,10 +4,11 @@ import pygame as pg
 from constants import consts as c
 
 class Projectile:
-    def __init__(self, x, y, theta, color, screen):
+    def __init__(self, x, y, theta, color, accelerate_forward, screen):
         self.x = x
         self.y = y
         self.color = color
+        self.accelerate_forward = accelerate_forward
         self.theta = theta
 
         self.screen = screen
@@ -22,6 +23,9 @@ class Projectile:
     def update(self):
         self.x += c.projectile_speed * c.dt * cos(self.theta)
         self.y += c.projectile_speed * c.dt * sin(self.theta)
+
+        if self.accelerate_forward:
+            self.x -= c.scroll_speed * c.dt
 
     def render(self):
         pg.draw.circle(self.screen, self.color, (int(self.x), int(self.y)), c.projectile_radius, 0)

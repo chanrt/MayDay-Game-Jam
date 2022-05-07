@@ -1,4 +1,4 @@
-from math import ceil, pi
+from math import ceil, pi, sqrt
 import pygame as pg
 
 from constants import consts as c
@@ -36,6 +36,7 @@ class Player:
         self.converting_mass_to_energy = False
         self.convert_energy_cycle = 0
 
+        self.fire_cycle = 0
         self.alive = True
 
     def reset_position(self):
@@ -61,7 +62,7 @@ class Player:
         self.alive = True
         self.revolve.color = self.electron_color
 
-    def update(self, keys_pressed):
+    def update(self, keys_pressed, dt):
         if self.alive:
             front_speed, back_speed, vertical_speed = 0, 0, 0
             if self.num_electrons > 0:
@@ -95,6 +96,8 @@ class Player:
                     self.increase_energy(c.atom_rate_multiplicative * energy_increase)
                 else:
                     self.increase_energy(energy_increase)
+
+            self.fire_cycle -= dt
             self.constrain_player()
             self.update_animations()
 
@@ -122,9 +125,9 @@ class Player:
 
     def decrease_mass(self, mass):
         self.mass -= mass
-        if self.mass < 0:
+        if self.mass <= 0:
             self.alive = False
-            self.radius = 0
+            self.radius = c.min_radius
         else:
             self.calculate_radius()
 
@@ -168,7 +171,8 @@ class Player:
             self.nuclear_mass = self.mass
             self.num_electrons = 0
 
-        self.radius = pow(self.nuclear_mass / (4 * pi * c.density), 1 / 3)
+        # self.radius = pow(self.nuclear_mass / (4 * pi * c.density), 1 / 3)
+        self.radius = c.min_radius + pow(self.nuclear_mass, 0.9) / c.player_density
         self.decide_animation()
 
     def constrain_player(self):

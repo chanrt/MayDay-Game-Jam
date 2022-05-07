@@ -369,7 +369,7 @@ imported by:
   <a target="code" href="" type="text/plain"><tt>'org.python'</tt></a>
 <span class="moduletype">MissingModule</span>  <div class="import">
 imported by:
-    <a href="#pickle">pickle</a>
+    <a href="#copy">copy</a>
  &#8226;   <a href="#setuptools.sandbox">setuptools.sandbox</a>
  &#8226;   <a href="#xml.sax">xml.sax</a>
 
@@ -1581,10 +1581,31 @@ imported by:
   <a target="code" href="-" type="text/plain"><tt>anims</tt></a>
 <span class="moduletype">NamespacePackage</span>  <div class="import">
 imported by:
-    <a href="#anims.explosion">anims.explosion</a>
+    <a href="#anims.directed_explosion">anims.directed_explosion</a>
+ &#8226;   <a href="#anims.explosion">anims.explosion</a>
+ &#8226;   <a href="#anims.fade">anims.fade</a>
  &#8226;   <a href="#anims.revolve">anims.revolve</a>
  &#8226;   <a href="#anims.ripple">anims.ripple</a>
  &#8226;   <a href="#anims.ripple_generator">anims.ripple_generator</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="anims.directed_explosion"></a>
+  <a target="code" href="///C:/Code/Game%20Development/MayDay%20Game%20Jam/anims/directed_explosion.py" type="text/plain"><tt>anims.directed_explosion</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#anims">anims</a>
+ &#8226;   <a href="#math">math</a>
+ &#8226;   <a href="#pygame">pygame</a>
+ &#8226;   <a href="#random">random</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#game_loop">game_loop</a>
 
   </div>
 
@@ -1605,6 +1626,24 @@ imports:
 imported by:
     <a href="#game_loop">game_loop</a>
  &#8226;   <a href="#main_menu">main_menu</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="anims.fade"></a>
+  <a target="code" href="///C:/Code/Game%20Development/MayDay%20Game%20Jam/anims/fade.py" type="text/plain"><tt>anims.fade</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#anims">anims</a>
+ &#8226;   <a href="#constants">constants</a>
+ &#8226;   <a href="#pygame">pygame</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#game_loop">game_loop</a>
 
   </div>
 
@@ -1659,6 +1698,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#objs.player">objs.player</a>
+ &#8226;   <a href="#objs.portal">objs.portal</a>
  &#8226;   <a href="#powerups.higgs_field">powerups.higgs_field</a>
 
   </div>
@@ -3449,13 +3489,15 @@ imported by:
   <a target="code" href="///C:/Code/Game%20Development/MayDay%20Game%20Jam/constants.py" type="text/plain"><tt>constants</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
 imports:
-    <a href="#math">math</a>
+    <a href="#load_data">load_data</a>
+ &#8226;   <a href="#math">math</a>
  &#8226;   <a href="#pygame">pygame</a>
 
   </div>
   <div class="import">
 imported by:
-    <a href="#anims.revolve">anims.revolve</a>
+    <a href="#anims.fade">anims.fade</a>
+ &#8226;   <a href="#anims.revolve">anims.revolve</a>
  &#8226;   <a href="#anims.ripple">anims.ripple</a>
  &#8226;   <a href="#collisions">collisions</a>
  &#8226;   <a href="#game_loop">game_loop</a>
@@ -3464,6 +3506,7 @@ imported by:
  &#8226;   <a href="#objs.artifacts">objs.artifacts</a>
  &#8226;   <a href="#objs.enemy">objs.enemy</a>
  &#8226;   <a href="#objs.player">objs.player</a>
+ &#8226;   <a href="#objs.portal">objs.portal</a>
  &#8226;   <a href="#objs.projectile">objs.projectile</a>
  &#8226;   <a href="#pause_screen">pause_screen</a>
  &#8226;   <a href="#powerups.higgs_field">powerups.higgs_field</a>
@@ -3557,8 +3600,8 @@ imported by:
   <a target="code" href="///C:/users/chess/appdata/local/programs/python/python310/lib/copy.py" type="text/plain"><tt>copy</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
 imports:
-    <a href="#copyreg">copyreg</a>
- &#8226;   <a href="#org">org</a>
+    <a href="#'org.python'">'org.python'</a>
+ &#8226;   <a href="#copyreg">copyreg</a>
  &#8226;   <a href="#types">types</a>
  &#8226;   <a href="#weakref">weakref</a>
 
@@ -7734,7 +7777,9 @@ imported by:
   <a target="code" href="///C:/Code/Game%20Development/MayDay%20Game%20Jam/game_loop.py" type="text/plain"><tt>game_loop</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
 imports:
-    <a href="#anims.explosion">anims.explosion</a>
+    <a href="#anims.directed_explosion">anims.directed_explosion</a>
+ &#8226;   <a href="#anims.explosion">anims.explosion</a>
+ &#8226;   <a href="#anims.fade">anims.fade</a>
  &#8226;   <a href="#collisions">collisions</a>
  &#8226;   <a href="#constants">constants</a>
  &#8226;   <a href="#itertools">itertools</a>
@@ -7743,6 +7788,7 @@ imports:
  &#8226;   <a href="#objs.artifacts">objs.artifacts</a>
  &#8226;   <a href="#objs.enemy">objs.enemy</a>
  &#8226;   <a href="#objs.player">objs.player</a>
+ &#8226;   <a href="#objs.portal">objs.portal</a>
  &#8226;   <a href="#objs.projectile">objs.projectile</a>
  &#8226;   <a href="#pause_screen">pause_screen</a>
  &#8226;   <a href="#powerups.higgs_field">powerups.higgs_field</a>
@@ -9739,7 +9785,8 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#game_loop">game_loop</a>
+    <a href="#constants">constants</a>
+ &#8226;   <a href="#game_loop">game_loop</a>
  &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#main_menu">main_menu</a>
  &#8226;   <a href="#pause_screen">pause_screen</a>
@@ -9978,6 +10025,7 @@ imported by:
  &#8226;   <a href="#PIL.JpegImagePlugin">PIL.JpegImagePlugin</a>
  &#8226;   <a href="#PyInstaller.utils.osx">PyInstaller.utils.osx</a>
  &#8226;   <a href="#_pydecimal">_pydecimal</a>
+ &#8226;   <a href="#anims.directed_explosion">anims.directed_explosion</a>
  &#8226;   <a href="#anims.explosion">anims.explosion</a>
  &#8226;   <a href="#anims.revolve">anims.revolve</a>
  &#8226;   <a href="#asyncio.windows_events">asyncio.windows_events</a>
@@ -14869,6 +14917,7 @@ imported by:
     <a href="#objs.artifacts">objs.artifacts</a>
  &#8226;   <a href="#objs.enemy">objs.enemy</a>
  &#8226;   <a href="#objs.player">objs.player</a>
+ &#8226;   <a href="#objs.portal">objs.portal</a>
  &#8226;   <a href="#objs.projectile">objs.projectile</a>
 
   </div>
@@ -14883,6 +14932,7 @@ imports:
     <a href="#constants">constants</a>
  &#8226;   <a href="#objs">objs</a>
  &#8226;   <a href="#pygame">pygame</a>
+ &#8226;   <a href="#random">random</a>
 
   </div>
   <div class="import">
@@ -14923,6 +14973,24 @@ imports:
  &#8226;   <a href="#math">math</a>
  &#8226;   <a href="#objs">objs</a>
  &#8226;   <a href="#pygame">pygame</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#game_loop">game_loop</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="objs.portal"></a>
+  <a target="code" href="///C:/Code/Game%20Development/MayDay%20Game%20Jam/objs/portal.py" type="text/plain"><tt>objs.portal</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#anims.ripple_generator">anims.ripple_generator</a>
+ &#8226;   <a href="#constants">constants</a>
+ &#8226;   <a href="#objs">objs</a>
 
   </div>
   <div class="import">
@@ -15068,7 +15136,7 @@ imported by:
   <a target="code" href="" type="text/plain"><tt>org</tt></a>
 <span class="moduletype">MissingModule</span>  <div class="import">
 imported by:
-    <a href="#copy">copy</a>
+    <a href="#pickle">pickle</a>
 
   </div>
 
@@ -15767,8 +15835,7 @@ imported by:
   <a target="code" href="///C:/users/chess/appdata/local/programs/python/python310/lib/pickle.py" type="text/plain"><tt>pickle</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
 imports:
-    <a href="#'org.python'">'org.python'</a>
- &#8226;   <a href="#_compat_pickle">_compat_pickle</a>
+    <a href="#_compat_pickle">_compat_pickle</a>
  &#8226;   <a href="#_pickle">_pickle</a>
  &#8226;   <a href="#codecs">codecs</a>
  &#8226;   <a href="#copyreg">copyreg</a>
@@ -15776,6 +15843,7 @@ imports:
  &#8226;   <a href="#functools">functools</a>
  &#8226;   <a href="#io">io</a>
  &#8226;   <a href="#itertools">itertools</a>
+ &#8226;   <a href="#org">org</a>
  &#8226;   <a href="#pprint">pprint</a>
  &#8226;   <a href="#re">re</a>
  &#8226;   <a href="#struct">struct</a>
@@ -16759,7 +16827,9 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#anims.explosion">anims.explosion</a>
+    <a href="#anims.directed_explosion">anims.directed_explosion</a>
+ &#8226;   <a href="#anims.explosion">anims.explosion</a>
+ &#8226;   <a href="#anims.fade">anims.fade</a>
  &#8226;   <a href="#anims.revolve">anims.revolve</a>
  &#8226;   <a href="#anims.ripple">anims.ripple</a>
  &#8226;   <a href="#constants">constants</a>
@@ -18140,6 +18210,7 @@ imports:
 imported by:
     <a href="#PIL.ImagePalette">PIL.ImagePalette</a>
  &#8226;   <a href="#altgraph.GraphUtil">altgraph.GraphUtil</a>
+ &#8226;   <a href="#anims.directed_explosion">anims.directed_explosion</a>
  &#8226;   <a href="#anims.explosion">anims.explosion</a>
  &#8226;   <a href="#email.generator">email.generator</a>
  &#8226;   <a href="#email.utils">email.utils</a>
@@ -18147,6 +18218,7 @@ imported by:
  &#8226;   <a href="#jinja2.filters">jinja2.filters</a>
  &#8226;   <a href="#jinja2.utils">jinja2.utils</a>
  &#8226;   <a href="#main_menu">main_menu</a>
+ &#8226;   <a href="#objs.artifacts">objs.artifacts</a>
  &#8226;   <a href="#secrets">secrets</a>
  &#8226;   <a href="#setuptools._vendor.more_itertools.more">setuptools._vendor.more_itertools.more</a>
  &#8226;   <a href="#setuptools._vendor.more_itertools.recipes">setuptools._vendor.more_itertools.recipes</a>

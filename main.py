@@ -23,7 +23,7 @@ if __name__ == '__main__':
         user_input = main_menu(screen)
 
         if user_input == "play":
-            pg.mixer.music.fadeout(1000)
+            pg.mixer.music.fadeout(500)
             game_loop(screen)
         elif user_input == "exit":
             pg.quit()

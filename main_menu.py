@@ -19,22 +19,22 @@ def make_new_projectiles(screen):
         x = randint(0, c.screen_width)
         y = 0
         theta = radians(randint(225 + 180, 335 + 180))
-        return Projectile(x, y, theta, color, screen)
+        return Projectile(x, y, theta, color, False, screen)
     elif panel == 1:
         x = c.screen_width
         y = randint(0, c.screen_height)
         theta = radians(randint(135 + 180, 225 + 180))
-        return Projectile(x, y, theta, color, screen)
+        return Projectile(x, y, theta, color, False, screen)
     elif panel == 2:
         x = randint(0, c.screen_width)
         y = c.screen_height
         theta = radians(randint(45 + 180, 135 + 180))
-        return Projectile(x, y, theta, color, screen)
+        return Projectile(x, y, theta, color, False, screen)
     elif panel == 3:
         x = 0
         y = randint(0, c.screen_height)
         theta = radians(randint(225 + 180, 315 + 180))
-        return Projectile(x, y, theta, color, screen)
+        return Projectile(x, y, theta, color, False, screen)
 
 
 def main_menu(screen):
@@ -69,7 +69,7 @@ def main_menu(screen):
         y = randint(0, c.screen_height)
         theta = radians(randint(0, 360))
         color = c.normal_nucleus_color if random() < 0.5 else c.anti_nucleus_color
-        projectiles.append(Projectile(x, y, theta, color, screen))
+        projectiles.append(Projectile(x, y, theta, color, False, screen))
 
     while True:
         clock.tick(60)

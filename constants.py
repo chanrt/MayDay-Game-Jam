@@ -1,6 +1,8 @@
 from math import pi
 import pygame as pg
 
+from load_data import get_resource_path
+
 class Constants:
     def __init__(self):
         pg.init()
@@ -28,7 +30,8 @@ class Constants:
         self.dt = 1 / self.fps
 
     def init_masses(self):
-        self.density = 0.0001
+        self.player_density = 0.5
+        self.enemy_density = 0.0001
         self.nucleon_mass = 1
         self.electron_mass = 0.2
 
@@ -36,19 +39,26 @@ class Constants:
         self.min_enemy_mass = 0.33
 
     def init_numbers(self):
+        self.max_time = 200
+
         self.max_nucleons = 12
         self.max_electrons = 6
-        self.max_nuclear_radius = pow(self.max_nucleons * self.nucleon_mass / (4 * pi * self.density), 1/3)
+        self.max_nuclear_radius = self.max_nucleons * self.nucleon_mass / self.player_density
+        # self.max_nuclear_radius = pow(self.max_nucleons * self.nucleon_mass / (4 * pi * self.density), 1/3)
         self.max_mass = self.max_nucleons * self.nucleon_mass + self.max_electrons * self.electron_mass
 
     def init_radii(self):
+        self.min_radius = 6
         self.electron_radius = 6
-        self.projectile_radius = 4
-
+        self.projectile_radius = 6
+        self.halo_thickness = 2
         self.higgs_radius = 50
 
     def init_speeds(self):
-        self.scroll_speed = 300
+        self.min_scroll_speed = 300
+        self.max_scroll_speed = 700
+        self.scroll_speed = self.min_scroll_speed
+
         self.atom_speed_front = 150
         self.atom_speed_back = 200
         self.atom_speed_vertical = 300
@@ -67,6 +77,8 @@ class Constants:
         self.ripples_color = pg.Color("green")
         self.artifact_color = pg.Color("yellow")
         self.annihilation_color = pg.Color("white")
+        self.halo_color = pg.Color("white")
+        self.fade_out_color = pg.Color("black")
 
     def init_damage(self):
         # damage intensities
@@ -77,12 +89,13 @@ class Constants:
         self.collision_collateral = 0.2
         self.mass_absorption = 0.5
 
-        # enemy fire cycle
-        self.enemy_fire_cycle = 60
+        # player fire cycle
+        self.player_fire_cooldown = 100
+        self.enemy_fire_cooldown = 500
 
         # energy parameters
         self.mass_energy_refill = 1
-        self.energy_increase_cycle =100
+        self.energy_increase_cycle = 100
         self.max_energy = 100
         self.energy_per_shot = 5
         self.energy_replenish_rate = 0.5
@@ -98,10 +111,10 @@ class Constants:
         self.higgs_mass_gain = 0.25 * self.max_mass
 
     def init_sounds(self):
-        self.button_clicked_sound = pg.mixer.Sound("sounds/button_press.wav")
-        self.start_game_sound = pg.mixer.Sound("sounds/start_game.wav")
-        self.main_menu_sound = pg.mixer.Sound("sounds/main_menu.wav")
-        self.pause_menu_sound = pg.mixer.Sound("sounds/pause_menu.wav")
+        self.button_clicked_sound = pg.mixer.Sound(get_resource_path("sounds/button_press.wav"))
+        self.start_game_sound = pg.mixer.Sound(get_resource_path("sounds/start_game.wav"))
+        self.main_menu_sound = pg.mixer.Sound(get_resource_path("sounds/main_menu.wav"))
+        self.pause_menu_sound = pg.mixer.Sound(get_resource_path("sounds/pause_menu.wav"))
 
     def set_screen_size(self, screen):
         self.screen_width, self.screen_height = screen.get_size()

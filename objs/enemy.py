@@ -9,6 +9,7 @@ class Enemy:
     def __init__(self, y, mass, matter, screen):
         self.x = c.screen_width + 20 * c.artifact_width
         self.y = y
+        self.init_mass = mass
         self.mass = mass
         self.matter = matter
         self.screen = screen
@@ -17,7 +18,7 @@ class Enemy:
         self.init_color()
 
         self.alive = True
-        self.fire_cycle = 1
+        self.fire_cycle = 0
 
     def init_color(self):
         if self.matter == "normal":
@@ -41,7 +42,7 @@ class Enemy:
             self.calculate_radius()
         
     def calculate_radius(self):
-        self.radius = pow(self.mass / (4 * pi * c.density), 1 / 3)
+        self.radius = pow(self.mass / (4 * pi * c.enemy_density), 1 / 3)
 
     def should_dodge(self, player, artifact):
         if artifact.y < self.y + 2 * self.radius and self.y - 2 * self.radius < artifact.y + c.artifact_height:
@@ -52,10 +53,8 @@ class Enemy:
         else:
             return False
 
-    def update(self, player, artifacts):
-        self.fire_cycle += 1
-        if self.fire_cycle == c.enemy_fire_cycle:
-            self.fire_cycle = 0
+    def update(self, player, artifacts, dt):
+        self.fire_cycle -= dt
 
         artifacts_in_front = list(filter(lambda a: a.x < self.x, artifacts))
         artifacts_in_front.sort(key=lambda a: a.x)
@@ -91,4 +90,5 @@ class Enemy:
             return True
         
     def render(self):
+        pg.draw.circle(self.screen, c.halo_color, (int(self.x), int(self.y)), int(self.radius) + c.halo_thickness)
         pg.draw.circle(self.screen, self.color, (int(self.x), int(self.y)), int(self.radius))

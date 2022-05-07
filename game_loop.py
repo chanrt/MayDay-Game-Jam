@@ -6,14 +6,17 @@ import pygame as pg
 from objs.artifacts import Artifact
 from collisions import *
 from constants import consts as c
+from anims.directed_explosion import DirectedExplosion
 from objs.enemy import Enemy
 from anims.explosion import Explosion
+from anims.fade import Fade
 from powerups.higgs_field import HiggsField
 from load_data import get_resource_path
 from pause_screen import pause_screen
 from objs.player import Player
 from ui.progress_bar import ProgressBar
 from objs.projectile import Projectile
+from objs.portal import Portal
 from ui.text import Text
 
 
@@ -45,6 +48,8 @@ def game_loop(screen, matter="normal"):
     mass_text.set_font(indicator_font)
     energy_text = Text(3 * c.screen_width // 4, below_title, "Energy", screen)
     energy_text.set_font(indicator_font)
+    remaining_distance_text = Text(c.screen_width // 2, c.screen_height - c.title_font_size, "Distance to portal:", screen)
+    remaining_distance_text.set_font(title_font)
 
     # progress bars
     below_indicator = c.title_font_size + c.indicator_font_size + 2 * c.progress_bar_thickness
@@ -56,7 +61,7 @@ def game_loop(screen, matter="normal"):
     energy_bar.fg_color = dominant_color
 
     # music
-    bg_music = pg.mixer.music.load(get_resource_path("music/game.mp3"))
+    pg.mixer.music.load(get_resource_path("music/game.mp3"))
     pg.mixer.music.play(-1)
 
     # sounds
@@ -65,18 +70,25 @@ def game_loop(screen, matter="normal"):
     enemy_hit_sound = pg.mixer.Sound(get_resource_path("sounds/enemy_hit.wav"))
     enemy_death_sound = pg.mixer.Sound(get_resource_path("sounds/enemy_death.wav"))
     enemy_shoot_sound = pg.mixer.Sound(get_resource_path("sounds/enemy_shoot.wav"))
+    enemy_shoot_sound.set_volume(0.1)
     energy_from_mass_sound = pg.mixer.Sound(get_resource_path("sounds/energy_from_mass.wav"))
+    energy_from_mass_sound.set_volume(0.3)
     higgs_sound = pg.mixer.Sound(get_resource_path("sounds/higgs.wav"))
     matter_change_sound = pg.mixer.Sound(get_resource_path("sounds/matter_change.wav"))
     player_shoot_sound = pg.mixer.Sound(get_resource_path("sounds/player_shoot.wav"))
-    player_shoot_sound.set_volume(0.2)
+    player_shoot_sound.set_volume(0.15)
     player_death_sound = pg.mixer.Sound(get_resource_path("sounds/player_death.wav"))
     player_hit_sound = pg.mixer.Sound(get_resource_path("sounds/player_hit.wav"))
+    player_mass_absorb_sound = pg.mixer.Sound(get_resource_path("sounds/player_mass_absorb.wav"))
+    player_mass_absorb_sound.set_volume(0.2)
     ricochet_sound = pg.mixer.Sound(get_resource_path("sounds/ricochet.wav"))
+    ricochet_sound.set_volume(0.5)
+    portal_sound = pg.mixer.Sound(get_resource_path("sounds/teleport.wav"))
 
     # animations
     animations = []
     game_over_animation = None
+    end_portal = None
 
     # artifacts
     artifacts = []
@@ -97,37 +109,21 @@ def game_loop(screen, matter="normal"):
     pg.time.set_timer(spawn_enemy, 1500)
 
     paused = 0
+    portal_reached = False
+    fire_button_pressed = False
+    game_time = 0
 
     while True:
         clock.tick(120)
 
-        # check game over
-        if game_over_animation is not None:
-            if not game_over_animation.display:
-                game_over_animation = None
-                matter_change_sound.play()
-
-                current_matter = "anti" if current_matter == "normal" else "normal"
-                opposite_matter = "anti" if opposite_matter == "normal" else "normal"
-                dominant_color = c.normal_nucleus_color if current_matter == "normal" else c.anti_nucleus_color
-
-                player.change_matter()
-                player.reset_position()
-
-                for artifact in artifacts:
-                    if abs(artifact.x - player.x) < c.screen_width // 2:
-                        artifacts.remove(artifact)
-
-                for enemy in enemies:
-                    enemy.change_matter()
-                for projectile in projectiles:
-                    projectile.change_matter()
-                mass_bar.fg_color = dominant_color
-                energy_bar.fg_color = dominant_color
-
+        # garbage collection
         for animation in animations:
             if not animation.display:
                 animations.remove(animation)
+                if isinstance(animation, DirectedExplosion):
+                    # absorbing mass
+                    player.increase_mass(c.mass_absorption * animation.source.init_mass)
+                    player_mass_absorb_sound.play()
         for artifact in artifacts:
             if artifact.outside_screen():
                 artifacts.remove(artifact)
@@ -136,12 +132,12 @@ def game_loop(screen, matter="normal"):
                 enemies.remove(enemy)
         for projectile in projectiles:
             if projectile.outside_screen() or projectile.active == False:
-                projectiles.remove(projectile)        
+                projectiles.remove(projectile)       
 
         # handle player input
         keys_pressed = pg.key.get_pressed()
         for event in pg.event.get():
-            if event.type == spawn_artifact:
+            if event.type == spawn_artifact and c.max_time - game_time > 5:
                 if random() < c.artifact_probability:
                     # generate artifact
                     y = random() * (c.screen_height - c.artifact_height)
@@ -149,7 +145,7 @@ def game_loop(screen, matter="normal"):
                     artifacts.append(new_artifact)
 
             if event.type == spawn_enemy:
-                if random() < c.enemy_probability:
+                if random() < c.enemy_probability and c.max_time - game_time > 5:
                     # generate enemy
                     y = random() * (c.screen_height)
                     mass = c.min_enemy_mass + random() * (c.max_enemy_mass - c.min_enemy_mass)
@@ -171,54 +167,72 @@ def game_loop(screen, matter="normal"):
                     elif user_input == "restart":
                         game_loop(screen)
                         return
-                if event.key == pg.K_q:
-                    # CHEAT
-                    player.increase_mass(0.2)
-                if event.key == pg.K_e:
-                    # CHEAT
-                    player.decrease_mass(0.2)
 
             if event.type == pg.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    # new projectile
-                    player_shoot_sound.play()
-                    mouse_x, mouse_y = pg.mouse.get_pos()
-                    angle = atan2(mouse_y - player.y, mouse_x - player.x)
-                    new_projectile = Projectile(player.x, player.y, angle, player.nucleus_color, screen)
-                    projectiles.append(new_projectile)
-                    player.decrease_energy(c.energy_per_shot)
+                    fire_button_pressed = True
 
-                    if player.converting_mass_to_energy and player.convert_energy_cycle == 0:
-                        energy_from_mass_sound.play()
+            if event.type == pg.MOUSEBUTTONUP:
+                if event.button == 1:
+                    fire_button_pressed = False
                     
             if event.type == pg.QUIT:
                 pg.quit()
                 quit()
 
+        # update UI
+        mass_bar.set_progress(player.mass / c.max_mass)
+        energy_bar.set_progress(player.energy / c.max_energy)
+        remaining_distance_text.set_text(f"Distance to portal: {int(c.max_time - game_time)} light years")
+        c.scroll_speed = c.min_scroll_speed + (c.max_scroll_speed - c.min_scroll_speed) * game_time / c.max_time
+
+        # fire projectiles (player)
+        if fire_button_pressed and player.fire_cycle <= 0:
+            player_shoot_sound.play()
+            mouse_x, mouse_y = pg.mouse.get_pos()
+            angle = atan2(mouse_y - player.y, mouse_x - player.x)
+            new_projectile = Projectile(player.x, player.y, angle, player.nucleus_color, False, screen)
+            projectiles.append(new_projectile)
+            player.decrease_energy(c.energy_per_shot)
+            player.fire_cycle = c.player_fire_cooldown
+
+            if player.converting_mass_to_energy and player.convert_energy_cycle == 0:
+                energy_from_mass_sound.play()
+
         # updates
-        if not paused:
-            player.update(keys_pressed)
+        if not paused and not portal_reached:
+            player.update(keys_pressed, c.dt * 1000)
             for animation in animations:
                 animation.update()
             for artifact in artifacts:
                 artifact.update()
             for enemy in enemies:
-                enemy.update(player, artifacts)
+                enemy.update(player, artifacts, c.dt * 1000)
             for powerup in powerups:
                 powerup.update()
             for projectile in projectiles:
                 projectile.update()
-        
-        mass_bar.set_progress(player.mass / c.max_mass)
-        energy_bar.set_progress(player.energy / c.max_energy)
+            if end_portal is not None:
+                end_portal.update()
+                if player.x > end_portal.x:
+                    portal_reached = True
+                    fade = Fade(0, 255, 120, c.fade_out_color, screen)
+                    animations.append(fade)
+                    game_over_animation = fade
+                    pg.mixer.music.stop()
+                    portal_sound.play()
+
+        if portal_reached:
+            game_over_animation.update()
 
         # see if any enemy is ready to fire
         for enemy in enemies:
-            if enemy.fire_cycle == 0:
+            if enemy.fire_cycle <= 0:
                 enemy_shoot_sound.play()
                 angle = atan2(player.y - enemy.y, player.x - enemy.x)
-                new_projectile = Projectile(enemy.x, enemy.y, angle, enemy.color, screen)
+                new_projectile = Projectile(enemy.x, enemy.y, angle, enemy.color, True, screen)
                 projectiles.append(new_projectile)
+                enemy.fire_cycle = c.enemy_fire_cooldown
 
         # collisions between artifacts and enemies
         for artifact in artifacts:
@@ -237,7 +251,6 @@ def game_loop(screen, matter="normal"):
                 collision_status = artifact_player_collision(artifact, player)
                 if collision_status != 0:
                     break
-
             if collision_status == 1:
                 player.lose_electrons()
                 mass_bar.set_progress(player.mass / c.max_mass)
@@ -279,10 +292,6 @@ def game_loop(screen, matter="normal"):
                     enemy_hit_sound.play()
                     enemy.take_damage(c.damage_to_enemy)
                     projectiles.remove(projectile)
-
-                    if player.mass <= c.max_nucleons * c.nucleon_mass:
-                        player.increase_mass(c.mass_absorption * enemy.mass)
-                        mass_bar.set_progress(player.mass / c.max_mass)
         
         # collisions between player and powerups
         if player.alive:
@@ -313,20 +322,60 @@ def game_loop(screen, matter="normal"):
                 projectile1.active = False
                 projectile2.active = False
                 explosion = Explosion(projectile1.x, projectile1.y, 2 * c.projectile_radius, c.annihilation_color, screen)
-                explosion.final_step = 25
+                explosion.final_step = 50
                 animations.append(explosion)
 
         # remove dead enemies and consider spawning powerups/pickups
         for enemy in enemies:
             if enemy.alive == False:
                 enemy_death_sound.play()
-                explosion = Explosion(enemy.x, enemy.y, enemy.radius, enemy.color, screen)
-                animations.append(explosion)
+                if player.num_electrons > 0:
+                    explosion = Explosion(enemy.x, enemy.y, enemy.radius, enemy.color, screen)
+                    animations.append(explosion)
+                else:
+                    directed_explosion = DirectedExplosion(enemy, player, enemy.radius, enemy.color, screen)
+                    animations.append(directed_explosion)
                 enemies.remove(enemy)
 
                 if player.mass < c.higgs_mass_cutoff and random() < c.higgs_probability:
                     higgs_field = HiggsField(enemy.x, enemy.y, screen)
                     powerups.append(higgs_field)
+
+        # check game over
+        if game_over_animation is not None:
+            if not game_over_animation.display:
+                if isinstance(game_over_animation, Explosion):
+                    # player death
+                    game_over_animation = None
+                    matter_change_sound.play()
+
+                    current_matter = "anti" if current_matter == "normal" else "normal"
+                    opposite_matter = "anti" if opposite_matter == "normal" else "normal"
+                    dominant_color = c.normal_nucleus_color if current_matter == "normal" else c.anti_nucleus_color
+
+                    player.change_matter()
+                    player.reset_position()
+
+                    for artifact in artifacts:
+                        if abs(artifact.x - player.x) < c.screen_width // 2:
+                            artifacts.remove(artifact)
+
+                    for enemy in enemies:
+                        enemy.change_matter()
+                    for projectile in projectiles:
+                        projectile.change_matter()
+                    mass_bar.fg_color = dominant_color
+                    energy_bar.fg_color = dominant_color
+                elif isinstance(game_over_animation, Fade):
+                    # game finished
+                    game_over_animation = None
+                    pg.mixer.music.load(get_resource_path("music/menu.mp3"))
+                    pg.mixer.music.play()
+                    return
+
+        # check if portal can be generated
+        if end_portal is None and c.max_time - game_time < 2:
+            end_portal = Portal(dominant_color, screen) 
 
         # clear screen
         screen.fill(bg_color)
@@ -343,10 +392,13 @@ def game_loop(screen, matter="normal"):
             powerup.render()
         for projectile in projectiles:
             projectile.render()
+        if end_portal is not None:
+            end_portal.render()
 
         energy_text.render()
         title_text.render()
         mass_text.render()
+        remaining_distance_text.render()
         
         energy_bar.render()
         mass_bar.render()
@@ -363,6 +415,11 @@ def game_loop(screen, matter="normal"):
         else:
             paused -= 1
             c.set_dt(0)
+
+        if not portal_reached:
+            game_time += c.dt
+        else:
+            game_time = c.max_time
 
 if __name__ == '__main__':
     pg.init()

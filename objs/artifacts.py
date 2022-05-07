@@ -1,4 +1,5 @@
 import pygame as pg
+from random import random
 
 from constants import consts as c
 
@@ -10,7 +11,7 @@ class Artifact:
         self.screen = screen
         self.rect = pg.Rect(self.x, self.y, c.artifact_width, c.artifact_height)
 
-        self.current_slide_speed = c.artifact_slide_speed
+        self.current_slide_speed = c.artifact_slide_speed if random() < 0.5 else -c.artifact_slide_speed
 
     def outside_screen(self):
         if self.x < -self.rect.width:
