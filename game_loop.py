@@ -21,7 +21,7 @@ from objs.portal import Portal
 from ui.text import Text
 
 
-def game_loop(screen, matter="anti"):
+def game_loop(screen, matter="normal"):
     clock = pg.time.Clock()
 
     # states

@@ -6,6 +6,10 @@ Animations:
 Fonts:
 1) Orbitron-Regular.ttf from https://fonts.google.com/specimen/Orbitron
 
+Idea and Testing:
+1) I would like to thank Mudit Bhatt, my friend and batchmate at IISc UG - Physics 2019
+   For brainstorming ideas with me and giving useful inputs
+
 Images:
 1) Splash image on loading screen from freepik.com
    <a href='https://www.freepik.com/vectors/atom'>Atom vector created by rawpixel.com - www.freepik.com</a>

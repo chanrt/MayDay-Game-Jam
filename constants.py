@@ -100,7 +100,7 @@ class Constants:
         self.energy_per_shot = 5
         self.energy_replenish_rate = 0.5
         self.atom_rate_multiplicative = 5
-        self.burst_mass = 2
+        self.burst_mass = 3
 
     def init_probabilities(self):
         self.enemy_probability = 0.7
