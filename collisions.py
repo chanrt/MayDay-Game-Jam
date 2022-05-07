@@ -27,6 +27,16 @@ def artifact_enemy_collision(artifact, enemy):
             return True
     return False
 
+def burst_enemy_collision(burst, enemy):
+    if distance_between(burst, enemy) < burst.ripple.radius:
+        return True
+    return False
+
+def burst_projectile_collision(burst, projectile):
+    if distance_between(burst, projectile) < burst.ripple.radius:
+        return True
+    return False
+
 def enemy_player_collision(enemy, player):
     if distance_between(player, enemy) < player.radius:
         return True

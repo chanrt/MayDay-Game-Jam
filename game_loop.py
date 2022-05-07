@@ -4,6 +4,7 @@ from random import random
 import pygame as pg
 
 from objs.artifacts import Artifact
+from objs.burst import Burst
 from collisions import *
 from constants import consts as c
 from anims.directed_explosion import DirectedExplosion
@@ -20,7 +21,7 @@ from objs.portal import Portal
 from ui.text import Text
 
 
-def game_loop(screen, matter="normal"):
+def game_loop(screen, matter="anti"):
     clock = pg.time.Clock()
 
     # states
@@ -66,6 +67,7 @@ def game_loop(screen, matter="normal"):
 
     # sounds
     artifact_enemy_collision_sound = pg.mixer.Sound(get_resource_path("sounds/artifact_enemy_collision.wav"))
+    burst_sound = pg.mixer.Sound(get_resource_path("sounds/burst.wav"))
     enemy_player_collision_sound = pg.mixer.Sound(get_resource_path("sounds/enemy_player_collision.wav"))
     enemy_hit_sound = pg.mixer.Sound(get_resource_path("sounds/enemy_hit.wav"))
     enemy_death_sound = pg.mixer.Sound(get_resource_path("sounds/enemy_death.wav"))
@@ -92,6 +94,9 @@ def game_loop(screen, matter="normal"):
 
     # artifacts
     artifacts = []
+
+    # bursts
+    bursts = []
 
     # enemies
     enemies = []
@@ -124,6 +129,9 @@ def game_loop(screen, matter="normal"):
                     # absorbing mass
                     player.increase_mass(c.mass_absorption * animation.source.init_mass)
                     player_mass_absorb_sound.play()
+        for burst in bursts:
+            if burst.outside_screen() or burst.active == False:
+                bursts.remove(burst)
         for artifact in artifacts:
             if artifact.outside_screen():
                 artifacts.remove(artifact)
@@ -171,6 +179,12 @@ def game_loop(screen, matter="normal"):
             if event.type == pg.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     fire_button_pressed = True
+                if player.matter == "anti" and event.button == 3:
+                    if player.mass > c.burst_mass:
+                        burst_sound.play()
+                        new_burst = Burst(player.x, player.y, dominant_color, screen)
+                        bursts.append(new_burst)
+                        player.decrease_mass(c.burst_mass)
 
             if event.type == pg.MOUSEBUTTONUP:
                 if event.button == 1:
@@ -206,6 +220,8 @@ def game_loop(screen, matter="normal"):
                 animation.update()
             for artifact in artifacts:
                 artifact.update()
+            for burst in bursts:
+                burst.update()
             for enemy in enemies:
                 enemy.update(player, artifacts, c.dt * 1000)
             for powerup in powerups:
@@ -267,6 +283,28 @@ def game_loop(screen, matter="normal"):
                 if artifact_projectile_collision(artifact, projectile):
                     ricochet_sound.play()
                     projectiles.remove(projectile)
+
+        # collisions between burst and enemies
+        for burst in bursts:
+            for enemy in enemies:
+                if burst_enemy_collision(burst, enemy):
+                    enemies.remove(enemy)
+                    enemy_death_sound.play()
+                    if player.num_electrons > 0:
+                        explosion = Explosion(enemy.x, enemy.y, enemy.radius, enemy.color, screen)
+                        animations.append(explosion)
+                    else:
+                        directed_explosion = DirectedExplosion(enemy, player, enemy.radius, enemy.color, screen)
+                        animations.append(directed_explosion)
+
+        # collisions between burst and projectiles
+        for burst in bursts:
+            for projectile in projectiles:
+                if burst.color != projectile.color and burst_projectile_collision(burst, projectile):
+                    projectiles.remove(projectile)
+                    explosion = Explosion(projectile1.x, projectile1.y, 2 * c.projectile_radius, c.annihilation_color, screen)
+                    explosion.final_step = 50
+                    animations.append(explosion)
 
         # collisions between enemies and player
         if player.alive:
@@ -386,6 +424,8 @@ def game_loop(screen, matter="normal"):
             animation.render()
         for artifact in artifacts:
             artifact.render()
+        for burst in bursts:
+            burst.render()
         for enemy in enemies:
             enemy.render()
         for powerup in powerups:

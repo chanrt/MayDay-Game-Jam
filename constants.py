@@ -39,7 +39,7 @@ class Constants:
         self.min_enemy_mass = 0.33
 
     def init_numbers(self):
-        self.max_time = 200
+        self.max_time = 100
 
         self.max_nucleons = 12
         self.max_electrons = 6
@@ -100,6 +100,7 @@ class Constants:
         self.energy_per_shot = 5
         self.energy_replenish_rate = 0.5
         self.atom_rate_multiplicative = 5
+        self.burst_mass = 2
 
     def init_probabilities(self):
         self.enemy_probability = 0.7
