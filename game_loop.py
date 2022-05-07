@@ -10,6 +10,7 @@ from objs.enemy import Enemy
 from anims.explosion import Explosion
 from powerups.higgs_field import HiggsField
 from load_data import get_resource_path
+from pause_screen import pause_screen
 from objs.player import Player
 from ui.progress_bar import ProgressBar
 from objs.projectile import Projectile
@@ -131,7 +132,12 @@ def game_loop(screen, matter="normal"):
 
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
-                    return
+                    user_input = pause_screen(screen)
+                    if user_input == "quit":
+                        return
+                    elif user_input == "restart":
+                        game_loop(screen)
+                        return
                 if event.key == pg.K_q:
                     # CHEAT
                     player.increase_mass(0.2)
