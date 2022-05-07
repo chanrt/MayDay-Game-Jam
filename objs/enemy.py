@@ -14,13 +14,23 @@ class Enemy:
         self.screen = screen
 
         self.calculate_radius()
+        self.init_color()
 
-        if matter == "normal":
+        self.alive = True
+        self.fire_cycle = 1
+
+    def init_color(self):
+        if self.matter == "normal":
             self.color = c.normal_nucleus_color
         else:
             self.color = c.anti_nucleus_color
-        self.alive = True
-        self.fire_cycle = 1
+
+    def change_matter(self):
+        if self.matter == "normal":
+            self.matter = "anti"
+        else:
+            self.matter = "normal"
+        self.init_color()
 
     def take_damage(self, damage):
         self.mass -= damage

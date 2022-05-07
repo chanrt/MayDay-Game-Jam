@@ -13,6 +13,12 @@ class Projectile:
         self.screen = screen
         self.active = True
 
+    def change_matter(self):
+        if self.color == c.normal_nucleus_color:
+            self.color = c.anti_nucleus_color
+        else:
+            self.color = c.normal_nucleus_color
+
     def update(self):
         self.x += c.projectile_speed * c.dt * cos(self.theta)
         self.y += c.projectile_speed * c.dt * sin(self.theta)

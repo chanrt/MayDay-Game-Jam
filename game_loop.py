@@ -15,12 +15,12 @@ from objs.projectile import Projectile
 from ui.text import Text
 
 
-def game_loop(screen):
+def game_loop(screen, matter="normal"):
     clock = pg.time.Clock()
 
     # states
-    current_matter = "normal"
-    opposite_matter = "anti"
+    current_matter = matter
+    opposite_matter = "anti" if matter == "normal" else "normal"
 
     # colors
     font_color = pg.Color("white")
@@ -141,6 +141,19 @@ def game_loop(screen):
                 if event.key == pg.K_e:
                     # CHEAT
                     player.decrease_mass(0.2)
+                if event.key == pg.K_f:
+                    # CHEAT
+                    current_matter = "anti" if current_matter == "normal" else "normal"
+                    opposite_matter = "anti" if opposite_matter == "normal" else "normal"
+                    dominant_color = c.normal_nucleus_color if current_matter == "normal" else c.anti_nucleus_color
+
+                    player.change_matter()
+                    for enemy in enemies:
+                        enemy.change_matter()
+                    for projectile in projectiles:
+                        projectile.change_matter()
+                    mass_bar.fg_color = dominant_color
+                    energy_bar.fg_color = dominant_color
 
             if event.type == pg.MOUSEBUTTONDOWN:
                 if event.button == 1:

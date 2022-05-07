@@ -38,6 +38,25 @@ class Player:
 
         self.alive = True
 
+    def change_matter(self):
+        if self.matter == "normal":
+            self.matter = "anti"
+        else:
+            self.matter = "normal"
+
+        if self.matter == "normal":
+            self.nucleus_color = c.normal_nucleus_color
+            self.electron_color = c.normal_electron_color
+        else:
+            self.nucleus_color = c.anti_nucleus_color
+            self.electron_color = c.anti_electron_color
+
+        self.mass = c.max_mass
+        self.calculate_radius()
+        self.energy = c.max_energy
+        self.alive = True
+        self.revolve.color = self.electron_color
+
     def update(self, keys_pressed):
         if self.alive:
             front_speed, back_speed, vertical_speed = 0, 0, 0
