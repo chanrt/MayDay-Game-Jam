@@ -3,8 +3,10 @@
  
  Executable in the dist folder. Runs only on Windows
  
- YouTube video: ![alt_text](https://youtu.be/Sr3rpCkgZxE)
+ Youtube Video: ![link](https://youtu.be/Sr3rpCkgZxE)
  
  ![alt_text](https://i.ibb.co/NKwF99Z/menu.png)
  
+ ![alt_text](https://i.ibb.co/X8b0QbK/matter.png)
  
+ ![alt_text](https://i.ibb.co/17Bx0Bn/antimatter.png)
